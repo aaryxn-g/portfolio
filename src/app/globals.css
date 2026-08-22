@@ -1,26 +1,267 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #08090b;
+  --foreground: #f5f5f5;
+  --muted: #a1a1aa;
+  --border: rgba(245, 245, 245, 0.12);
+  --accent: #7c5cff;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-space-grotesk);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  color-scheme: dark;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* Ambient background system: technical grid, cursor glow, and a faint
+   code/graph watermark that runs the full height of the page. */
+.bg-grid-layer {
+  background-image:
+    linear-gradient(to right, rgba(245, 245, 245, 0.035) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(245, 245, 245, 0.035) 1px, transparent 1px);
+  background-size: 64px 64px;
+  -webkit-mask-image: radial-gradient(ellipse 120% 90% at 50% 25%, black 40%, transparent 100%);
+  mask-image: radial-gradient(ellipse 120% 90% at 50% 25%, black 40%, transparent 100%);
+}
+
+.bg-cursor-glow {
+  background: radial-gradient(
+    560px circle at var(--glow-x, 50%) var(--glow-y, 20%),
+    rgba(124, 92, 255, 0.1),
+    transparent 70%
+  );
+  opacity: var(--glow-opacity, 0);
+  transition: opacity 0.6s ease;
+}
+
+.bg-parallax-layer {
+  transform: translate3d(var(--parallax-x, 0px), var(--parallax-y, 0px), 0);
+  transition: transform 0.4s ease-out;
+  will-change: transform;
+}
+
+.bg-code-fragment {
+  position: absolute;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+  color: rgba(245, 245, 245, 0.05);
+  user-select: none;
+  animation: code-drift 14s ease-in-out infinite;
+}
+
+.bg-graph {
+  color: rgba(245, 245, 245, 0.4);
+}
+
+.bg-node {
+  animation: node-breathe 7s ease-in-out infinite;
+}
+
+@keyframes node-breathe {
+  0%,
+  100% {
+    opacity: 0.15;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+@keyframes code-drift {
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-4px);
+  }
+}
+
+/* Thin scroll progress indicator, pure CSS via scroll-driven animation.
+   Degrades gracefully to a static, invisible bar where unsupported. */
+.scroll-progress-bar {
+  transform-origin: left;
+  transform: scaleX(0);
+}
+
+@supports (animation-timeline: scroll()) {
+  .scroll-progress-bar {
+    animation: scroll-progress linear both;
+    animation-timeline: scroll(root);
+  }
+}
+
+@keyframes scroll-progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes signal-pulse {
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: scale(0.85);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+}
+
+.signal-dot {
+  animation: signal-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes portrait-settle {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.02);
+  }
+}
+
+.portrait-settle {
+  animation: portrait-settle 4s cubic-bezier(0.16, 1, 0.3, 1) 0.9s forwards;
+}
+
+@media (max-width: 767px) {
+  .bg-graph,
+  .bg-code-fragment {
+    display: none;
+  }
+}
+
+/* Hero entrance animation */
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.reveal {
+  opacity: 0;
+  animation: reveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes scroll-bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(6px);
+  }
+}
+
+.scroll-indicator {
+  display: inline-block;
+  animation: scroll-bounce 2s ease-in-out infinite;
+}
+
+/* Scroll-triggered reveal, used by sections below the Hero */
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.scroll-reveal-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .reveal {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .scroll-indicator {
+    animation: none;
+  }
+
+  .scroll-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .bg-node,
+  .bg-code-fragment,
+  .signal-dot {
+    animation: none;
+    opacity: 0.3;
+  }
+
+  .bg-parallax-layer {
+    transform: none;
+    transition: none;
+  }
+
+  .bg-cursor-glow {
+    opacity: 0;
+  }
+
+  .scroll-progress-bar {
+    animation: none;
+  }
+
+  .portrait-settle {
+    animation: none;
+  }
+
+  /* SMIL animations (the graph's traveling pulse dots) don't respond to this
+     media query on their own, so hide them directly instead. */
+  .bg-pulse {
+    display: none;
+  }
 }
