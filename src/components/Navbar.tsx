@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "motion/react";
 import { BRAND_NAME, NAV_LINKS } from "@/data/navigation";
 
 export default function Navbar() {
@@ -39,7 +40,7 @@ export default function Navbar() {
         aria-label="Primary"
         className={`flex w-full max-w-5xl items-center justify-between rounded-full border transition-all duration-300 ${
           scrolled
-            ? "border-border bg-background/80 px-5 py-2.5 shadow-[0_1px_0_0_rgba(245,245,245,0.03)] backdrop-blur-md"
+            ? "border-border bg-background/80 px-5 py-2.5 backdrop-blur-md"
             : "border-transparent bg-transparent px-2 py-3"
         }`}
       >
@@ -98,24 +99,33 @@ export default function Navbar() {
         </button>
       </nav>
 
-      {isOpen && (
-        <nav
-          id="mobile-nav"
-          aria-label="Mobile"
-          className="fixed inset-0 z-40 flex flex-col items-center justify-center gap-8 bg-background md:hidden"
-        >
-          {NAV_LINKS.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              onClick={() => setIsOpen(false)}
-              className="font-mono text-2xl uppercase tracking-[0.08em] text-foreground transition-colors duration-200 hover:text-accent"
-            >
-              {link.label}
-            </a>
-          ))}
-        </nav>
-      )}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.nav
+            id="mobile-nav"
+            aria-label="Mobile"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+            className="fixed inset-0 z-40 flex flex-col items-center justify-center gap-8 bg-background md:hidden"
+          >
+            {NAV_LINKS.map((link, index) => (
+              <motion.a
+                key={link.href}
+                href={link.href}
+                onClick={() => setIsOpen(false)}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.05 + index * 0.04, ease: [0.16, 1, 0.3, 1] }}
+                className="font-mono text-2xl uppercase tracking-[0.08em] text-foreground transition-colors duration-200 hover:text-accent"
+              >
+                {link.label}
+              </motion.a>
+            ))}
+          </motion.nav>
+        )}
+      </AnimatePresence>
     </header>
   );
 }

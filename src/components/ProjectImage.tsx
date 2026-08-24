@@ -1,3 +1,6 @@
+"use client";
+
+import { motion } from "motion/react";
 import FramedImage from "@/components/FramedImage";
 
 interface ProjectImageProps {
@@ -21,16 +24,14 @@ export default function ProjectImage({
 }: ProjectImageProps) {
   return (
     <div
-      className={`relative overflow-hidden rounded-xl border border-border transition-colors duration-300 group-hover:border-accent/40 ${className}`}
+      className={`relative overflow-hidden border border-border transition-colors duration-300 group-hover:border-accent/40 ${className}`}
     >
-      <FramedImage
-        src={src}
-        alt={alt}
-        aspectRatio={aspectRatio}
-        sizes={sizes}
-        fit={fit}
-        imageClassName="transition-[transform,filter] duration-500 group-hover:scale-[1.03] group-hover:contrast-[1.05]"
-      />
+      <motion.div
+        variants={{ rest: { scale: 1 }, hover: { scale: 1.02 } }}
+        transition={{ type: "spring", stiffness: 240, damping: 26 }}
+      >
+        <FramedImage src={src} alt={alt} aspectRatio={aspectRatio} sizes={sizes} fit={fit} />
+      </motion.div>
 
       <div
         aria-hidden="true"

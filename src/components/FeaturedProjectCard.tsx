@@ -1,3 +1,6 @@
+"use client";
+
+import { motion } from "motion/react";
 import CountUpValue from "@/components/CountUpValue";
 import ProjectImage from "@/components/ProjectImage";
 import type { ProjectEntry } from "@/data/projects";
@@ -12,15 +15,29 @@ const GRID_COLS: Record<"default" | "large", string> = {
   large: "lg:grid-cols-[0.85fr_1.15fr]",
 };
 
+// ROC-AUC comparison for PropNet: real, already-published values only, shown
+// on their true 0-1 scale (no normalization to a max, so the bar length is
+// the value itself, not a relative exaggeration).
+const PROPNET_COMPARISON = [
+  { label: "This Work — ROC-AUC", value: 0.989, highlight: true },
+  { label: "BERT", value: 0.973, highlight: false },
+  { label: "Graph Baseline", value: 0.725, highlight: false },
+];
+
 export default function FeaturedProjectCard({ project, total }: FeaturedProjectCardProps) {
   const gridCols = GRID_COLS[project.imageProminence ?? "default"];
+  const isPropnet = project.id === "propnet";
 
   return (
-    <article className="group overflow-hidden rounded-2xl border border-border transition-colors duration-300 hover:border-accent/40">
+    <motion.article
+      initial="rest"
+      whileHover="hover"
+      className="group overflow-hidden border border-border transition-colors duration-300 hover:border-accent/40"
+    >
       <div className={`grid gap-10 p-6 sm:p-10 lg:items-center lg:gap-16 lg:p-14 ${gridCols}`}>
-        <div className="flex flex-col gap-6 transition-transform duration-500 lg:group-hover:translate-x-1">
+        <div className="flex flex-col gap-6">
           <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent">
-            Featured Project
+            {project.category}
           </span>
 
           <p className="font-mono text-xs uppercase tracking-[0.3em] text-muted transition-transform duration-300 group-hover:translate-x-0.5">
@@ -64,13 +81,15 @@ export default function FeaturedProjectCard({ project, total }: FeaturedProjectC
           ) : null}
 
           {project.metric ? (
-            <div className="flex flex-col gap-1 border-t border-border pt-5 transition-colors duration-300 group-hover:border-accent/30">
+            <div className="flex flex-col gap-1 border-t border-border pt-5">
               <span className="font-mono text-xs uppercase tracking-[0.25em] text-muted">
                 {project.metric.label}
               </span>
-              <span className="text-3xl font-medium text-foreground transition-colors duration-300 sm:text-4xl group-hover:text-accent">
+              <span className="text-3xl font-medium text-foreground sm:text-4xl">
                 {project.id === "propnet" ? (
                   <CountUpValue to={0.989} decimals={3} suffix=" ± 0.004" />
+                ) : project.id === "quantum-mas" ? (
+                  <CountUpValue to={4} decimals={0} suffix="× Improvement" />
                 ) : (
                   project.metric.value
                 )}
@@ -78,7 +97,37 @@ export default function FeaturedProjectCard({ project, total }: FeaturedProjectC
             </div>
           ) : null}
 
-          {project.benchmarks?.length ? (
+          {isPropnet ? (
+            <div className="flex flex-col gap-3 border-t border-border pt-5">
+              <span className="font-mono text-xs uppercase tracking-[0.25em] text-muted">
+                ROC-AUC vs. Baselines
+              </span>
+              <ul className="flex flex-col gap-2.5">
+                {PROPNET_COMPARISON.map((bar) => (
+                  <li key={bar.label} className="flex flex-col gap-1.5">
+                    <div className="flex items-baseline justify-between gap-4 font-mono text-[11px] uppercase tracking-[0.12em] text-muted">
+                      <span className={bar.highlight ? "text-accent" : undefined}>{bar.label}</span>
+                      <span className={bar.highlight ? "text-accent" : undefined}>{bar.value.toFixed(3)}</span>
+                    </div>
+                    <div className="h-[3px] w-full bg-border/60">
+                      <motion.div
+                        className={`h-full ${bar.highlight ? "bg-accent" : "bg-muted/70"}`}
+                        style={{ transformOrigin: "left" }}
+                        initial={{ scaleX: 0 }}
+                        whileInView={{ scaleX: bar.value }}
+                        viewport={{ once: true, amount: 0.6 }}
+                        transition={{
+                          duration: 0.8,
+                          ease: [0.16, 1, 0.3, 1],
+                          delay: bar.highlight ? 0 : 0.15,
+                        }}
+                      />
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : project.benchmarks?.length ? (
             <ul className="flex flex-col gap-2">
               {project.benchmarks.map((benchmark) => (
                 <li
@@ -125,9 +174,8 @@ export default function FeaturedProjectCard({ project, total }: FeaturedProjectC
           aspectRatio={project.image.aspectRatio}
           fit={project.image.fit}
           sizes="(min-width: 1024px) 620px, 100vw"
-          className="transition-transform duration-500 group-hover:-translate-y-1"
         />
       </div>
-    </article>
+    </motion.article>
   );
 }

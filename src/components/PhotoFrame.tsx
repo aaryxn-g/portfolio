@@ -33,7 +33,7 @@ export default function PhotoFrame({
       <span aria-hidden="true" className="absolute -bottom-2 -left-2 h-3 w-3 border-b border-l border-accent/50" />
       <span aria-hidden="true" className="absolute -bottom-2 -right-2 h-3 w-3 border-b border-r border-accent/50" />
 
-      <div className="relative h-full w-full overflow-hidden rounded-xl border border-border transition-colors duration-300 group-hover:border-accent/40">
+      <div className="relative h-full w-full overflow-hidden border border-border transition-colors duration-300 group-hover:border-accent/40">
         {aspectRatio ? (
           <FramedImage
             src={src}
@@ -44,7 +44,7 @@ export default function PhotoFrame({
             scale={scale}
             // A fixed `scale` (set inline) would otherwise be overridden by this
             // hover class, since inline transforms win over Tailwind utilities.
-            imageClassName={scale ? "" : "transition-transform duration-500 group-hover:scale-[1.03]"}
+            imageClassName={scale ? "" : "transition-transform duration-500 group-hover:scale-[1.02]"}
           />
         ) : (
           <div className="relative aspect-[4/3] w-full lg:aspect-[5/4]">
@@ -53,7 +53,7 @@ export default function PhotoFrame({
               alt={alt}
               fill
               sizes={sizes}
-              className={scale ? "" : "transition-transform duration-500 group-hover:scale-[1.03]"}
+              className={scale ? "" : "transition-transform duration-500 group-hover:scale-[1.02]"}
               style={{
                 objectFit: "cover",
                 objectPosition: position,

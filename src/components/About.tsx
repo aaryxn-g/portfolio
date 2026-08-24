@@ -23,7 +23,7 @@ export default function About() {
               </h2>
             </Reveal>
 
-            <Reveal delay={100} className="group/frame relative w-full overflow-hidden rounded-2xl border border-border transition-colors duration-500 hover:border-accent/40">
+            <Reveal delay={100} className="group/frame relative w-full overflow-hidden border border-border transition-colors duration-500 hover:border-accent/40">
               <FramedImage
                 src={ABOUT_CONTENT.image.src}
                 alt={ABOUT_CONTENT.image.alt}
@@ -70,17 +70,13 @@ export default function About() {
               <ul className="flex flex-col">
                 {ABOUT_CONTENT.interests.map((interest, index) => (
                   <li key={interest}>
-                    <span className="group relative flex items-baseline gap-3 overflow-hidden border-b border-border py-3 transition-all duration-300 hover:translate-x-1">
+                    <span className="group relative flex items-baseline gap-3 border-b border-border py-3">
                       <span className="font-mono text-[10px] text-muted transition-colors duration-300 group-hover:text-accent">
                         {String(index + 1).padStart(2, "0")}
                       </span>
                       <span className="font-mono text-sm uppercase tracking-[0.08em] text-foreground transition-colors duration-300 group-hover:text-accent">
                         {interest}
                       </span>
-                      <span
-                        aria-hidden="true"
-                        className="ml-auto h-1 w-1 shrink-0 scale-0 rounded-full bg-accent opacity-0 transition-all duration-300 group-hover:scale-100 group-hover:opacity-100"
-                      />
                       <span
                         aria-hidden="true"
                         className="absolute inset-x-0 bottom-0 h-px w-0 bg-accent transition-all duration-300 group-hover:w-full"

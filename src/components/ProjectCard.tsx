@@ -1,3 +1,6 @@
+"use client";
+
+import { motion } from "motion/react";
 import ProjectImage from "@/components/ProjectImage";
 import type { ProjectEntry } from "@/data/projects";
 
@@ -11,9 +14,13 @@ export default function ProjectCard({ project, total, size = "md" }: ProjectCard
   const isMd = size === "md";
 
   return (
-    <article className="group flex flex-col gap-6 rounded-2xl border border-border p-6 transition-colors duration-300 hover:border-accent/40 sm:p-8">
-      <div className="flex flex-col gap-4 transition-transform duration-500 group-hover:translate-x-0.5">
-        <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted">
+    <motion.article
+      initial="rest"
+      whileHover="hover"
+      className="group flex flex-col gap-6 border border-border p-6 transition-colors duration-300 hover:border-accent/40 sm:p-8"
+    >
+      <div className="flex flex-col gap-4">
+        <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted transition-transform duration-300 group-hover:translate-x-0.5">
           <span className="text-accent">{project.index}</span> / {String(total).padStart(2, "0")} · {project.category}
           {project.date ? ` · ${project.date}` : ""}
         </p>
@@ -69,6 +76,6 @@ export default function ProjectCard({ project, total, size = "md" }: ProjectCard
         fit={project.image.fit}
         sizes="(min-width: 768px) 45vw, 100vw"
       />
-    </article>
+    </motion.article>
   );
 }

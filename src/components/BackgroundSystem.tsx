@@ -1,14 +1,18 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { motion, useMotionTemplate, useMotionValue, useSpring } from "motion/react";
 
-const CODE_FRAGMENTS: Array<{ text: string; top: string; left?: string; right?: string; rotate: number; delay: number }> = [
-  { text: "const agent = initializeNetwork(...)", top: "8%", left: "6%", rotate: -1.5, delay: 0 },
-  { text: "quantumState.prepare()", top: "24%", right: "8%", rotate: 1, delay: 2 },
-  { text: "graph.propagate()", top: "46%", left: "4%", rotate: 0.5, delay: 4 },
-  { text: "model.fit(dataset)", top: "63%", right: "5%", rotate: -1, delay: 1 },
-  { text: "attention(...)", top: "79%", left: "8%", rotate: 1.5, delay: 3 },
-  { text: "route.optimize()", top: "93%", right: "10%", rotate: -0.5, delay: 5 },
+// Fragments drawn from the portfolio's own established research facts and
+// figures, not generic ML boilerplate. Kept factually accurate; the point is
+// atmosphere, not a claim, so they stay far too faint to be read as data.
+const NOTATION_FRAGMENTS: Array<{ text: string; top: string; left?: string; right?: string; rotate: number }> = [
+  { text: "ROC-AUC 0.989 ± 0.004", top: "10%", left: "6%", rotate: -1.2 },
+  { text: "shared entanglement", top: "27%", right: "7%", rotate: 0.8 },
+  { text: "propagation-tree embedding", top: "45%", left: "4%", rotate: -0.6 },
+  { text: "equalized odds", top: "62%", right: "6%", rotate: 1 },
+  { text: "Dijkstra's algorithm", top: "78%", left: "7%", rotate: -1 },
+  { text: "decoherence-aware routing", top: "93%", right: "9%", rotate: 0.6 },
 ];
 
 /** Small asymmetric node cluster, upper-right of the page. */
@@ -30,10 +34,6 @@ const CLUSTER_A = {
     [5, 0],
     [0, 2],
   ],
-  pulses: [
-    [0, 1],
-    [3, 4],
-  ],
 };
 
 /** Smaller cluster, lower-left of the page. */
@@ -52,10 +52,10 @@ const CLUSTER_B = {
     [1, 4],
     [0, 4],
   ],
-  pulses: [[1, 2]],
+  pulse: [1, 2] as [number, number],
 };
 
-function GraphCluster({ cluster }: { cluster: typeof CLUSTER_A }) {
+function GraphCluster({ cluster }: { cluster: typeof CLUSTER_A & { pulse?: [number, number] } }) {
   return (
     <svg viewBox="0 0 200 200" className="h-full w-full" fill="none">
       <g stroke="currentColor" strokeWidth="1">
@@ -78,86 +78,96 @@ function GraphCluster({ cluster }: { cluster: typeof CLUSTER_A }) {
           r="2.5"
           className="bg-node"
           fill="currentColor"
-          style={{ animationDelay: `${i * 0.9}s`, animationDuration: `${6 + (i % 3)}s` }}
+          style={{ animationDelay: `${i * 1.1}s`, animationDuration: `${8 + (i % 3)}s` }}
         />
       ))}
 
-      {cluster.pulses.map(([a, b]) => (
-        <circle key={`pulse-${a}-${b}`} r="2" className="bg-pulse fill-accent">
+      {cluster.pulse ? (
+        <circle r="2" className="bg-pulse fill-accent">
           <animateMotion
-            dur={`${5 + a}s`}
+            dur="7s"
             repeatCount="indefinite"
-            path={`M ${cluster.nodes[a].x},${cluster.nodes[a].y} L ${cluster.nodes[b].x},${cluster.nodes[b].y}`}
+            path={`M ${cluster.nodes[cluster.pulse[0]].x},${cluster.nodes[cluster.pulse[0]].y} L ${cluster.nodes[cluster.pulse[1]].x},${cluster.nodes[cluster.pulse[1]].y}`}
           />
-          <animate attributeName="opacity" values="0;0.8;0" dur={`${5 + a}s`} repeatCount="indefinite" />
+          <animate attributeName="opacity" values="0;0.6;0" dur="7s" repeatCount="indefinite" />
         </circle>
-      ))}
+      ) : null}
     </svg>
   );
 }
 
 export default function BackgroundSystem() {
-  const glowRef = useRef<HTMLDivElement>(null);
   const parallaxRef = useRef<HTMLDivElement>(null);
+
+  // Raw pointer position feeding a spring, so the light trails the cursor with
+  // a slight physical lag rather than snapping to it every frame.
+  const lightX = useMotionValue(0);
+  const lightY = useMotionValue(0);
+  const springX = useSpring(lightX, { stiffness: 40, damping: 22, mass: 0.6 });
+  const springY = useSpring(lightY, { stiffness: 40, damping: 22, mass: 0.6 });
+  const lightBackground = useMotionTemplate`radial-gradient(560px circle at ${springX}px ${springY}px, rgba(245, 245, 245, 0.05), rgba(245, 245, 245, 0.018) 32%, transparent 62%)`;
+
+  // Starts invisible so there's no flash of light pinned at the top-left
+  // corner before the pointer has actually moved; fades in on first move.
+  const lightOpacity = useMotionValue(0);
+  const springOpacity = useSpring(lightOpacity, { stiffness: 60, damping: 20 });
 
   useEffect(() => {
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const isCoarsePointer = window.matchMedia("(pointer: coarse)").matches;
     if (prefersReducedMotion || isCoarsePointer) return;
 
-    const glow = glowRef.current;
     const parallax = parallaxRef.current;
-    if (!glow || !parallax) return;
-
     let frame: number | null = null;
 
     const handlePointerMove = (event: PointerEvent) => {
+      // Viewport-relative coordinates: the light is fixed, so it keeps
+      // tracking the cursor while the page scrolls underneath it.
+      lightX.set(event.clientX);
+      lightY.set(event.clientY);
+      lightOpacity.set(1);
+
+      if (!parallax) return;
       if (frame !== null) cancelAnimationFrame(frame);
       frame = requestAnimationFrame(() => {
-        glow.style.setProperty("--glow-x", `${event.clientX}px`);
-        glow.style.setProperty("--glow-y", `${event.clientY}px`);
-        glow.style.setProperty("--glow-opacity", "1");
-
         const nx = event.clientX / window.innerWidth - 0.5;
         const ny = event.clientY / window.innerHeight - 0.5;
-        parallax.style.setProperty("--parallax-x", `${nx * 10}px`);
-        parallax.style.setProperty("--parallax-y", `${ny * 10}px`);
+        parallax.style.setProperty("--parallax-x", `${nx * 6}px`);
+        parallax.style.setProperty("--parallax-y", `${ny * 6}px`);
       });
     };
 
-    const handlePointerLeave = () => {
-      glow.style.setProperty("--glow-opacity", "0");
-    };
+    const handlePointerLeave = () => lightOpacity.set(0);
 
     window.addEventListener("pointermove", handlePointerMove);
-    window.addEventListener("pointerleave", handlePointerLeave);
+    document.documentElement.addEventListener("mouseleave", handlePointerLeave);
 
     return () => {
       if (frame !== null) cancelAnimationFrame(frame);
       window.removeEventListener("pointermove", handlePointerMove);
-      window.removeEventListener("pointerleave", handlePointerLeave);
+      document.documentElement.removeEventListener("mouseleave", handlePointerLeave);
     };
-  }, []);
+  }, [lightX, lightY, lightOpacity]);
 
   return (
     <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-      <div ref={glowRef} className="fixed inset-0">
+      <div className="fixed inset-0">
         <div className="bg-grid-layer absolute inset-0" />
-        <div className="bg-cursor-glow absolute inset-0" />
+        <motion.div
+          className="bg-light-layer absolute inset-0"
+          style={{ background: lightBackground, opacity: springOpacity }}
+        />
       </div>
 
       <div ref={parallaxRef} className="bg-parallax-layer absolute inset-0">
-        <div className="bg-graph absolute -right-16 top-[6%] h-[36vh] w-[36vh] opacity-[0.06] sm:h-[42vh] sm:w-[42vh]">
+        <div className="bg-graph absolute -right-16 top-[6%] h-[34vh] w-[34vh] opacity-[0.05] sm:h-[40vh] sm:w-[40vh]">
           <GraphCluster cluster={CLUSTER_A} />
         </div>
-        <div className="bg-graph absolute -left-14 top-[54%] h-[28vh] w-[28vh] opacity-[0.05]">
-          <GraphCluster cluster={CLUSTER_B} />
-        </div>
-        <div className="bg-graph absolute -right-10 top-[86%] h-[24vh] w-[24vh] opacity-[0.045]">
+        <div className="bg-graph absolute -left-14 top-[54%] h-[26vh] w-[26vh] opacity-[0.045]">
           <GraphCluster cluster={CLUSTER_B} />
         </div>
 
-        {CODE_FRAGMENTS.map((fragment) => (
+        {NOTATION_FRAGMENTS.map((fragment) => (
           <span
             key={fragment.text}
             className="bg-code-fragment"
@@ -166,7 +176,6 @@ export default function BackgroundSystem() {
               left: fragment.left,
               right: fragment.right,
               transform: `rotate(${fragment.rotate}deg)`,
-              animationDelay: `${fragment.delay}s`,
             }}
           >
             {fragment.text}

@@ -1,3 +1,4 @@
+import { MotionConfig } from "motion/react";
 import BackgroundSystem from "@/components/BackgroundSystem";
 import ScrollProgress from "@/components/ScrollProgress";
 import Navbar from "@/components/Navbar";
@@ -10,16 +11,18 @@ import Contact from "@/components/Contact";
 
 export default function Home() {
   return (
-    <div className="relative isolate">
-      <BackgroundSystem />
-      <ScrollProgress />
-      <Navbar />
-      <Hero />
-      <About />
-      <Experience />
-      <Projects />
-      <LeadershipAchievements />
-      <Contact />
-    </div>
+    <MotionConfig reducedMotion="user">
+      <div className="relative isolate">
+        <BackgroundSystem />
+        <ScrollProgress />
+        <Navbar />
+        <Hero />
+        <About />
+        <Experience />
+        <Projects />
+        <LeadershipAchievements />
+        <Contact />
+      </div>
+    </MotionConfig>
   );
 }

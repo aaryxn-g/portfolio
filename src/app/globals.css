@@ -14,9 +14,9 @@
   --color-muted: var(--muted);
   --color-border: var(--border);
   --color-accent: var(--accent);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-display: var(--font-space-grotesk);
+  --font-sans: var(--font-plex-sans);
+  --font-mono: var(--font-plex-mono);
+  --font-display: var(--font-fraunces);
 }
 
 html {
@@ -35,31 +35,33 @@ body {
   border-radius: 2px;
 }
 
-/* Ambient background system: technical grid, cursor glow, and a faint
-   code/graph watermark that runs the full height of the page. */
+/* Ambient background system: a faint technical grid plus a quiet layer of
+   notation drawn from the actual research (see BackgroundSystem.tsx). No
+   glow, no orb — the grid and parallax layer are the only moving parts, and
+   the parallax shift is small enough to read as presence, not decoration. */
 .bg-grid-layer {
   background-image:
-    linear-gradient(to right, rgba(245, 245, 245, 0.035) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(245, 245, 245, 0.035) 1px, transparent 1px);
+    linear-gradient(to right, rgba(245, 245, 245, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(245, 245, 245, 0.03) 1px, transparent 1px);
   background-size: 64px 64px;
   -webkit-mask-image: radial-gradient(ellipse 120% 90% at 50% 25%, black 40%, transparent 100%);
   mask-image: radial-gradient(ellipse 120% 90% at 50% 25%, black 40%, transparent 100%);
 }
 
-.bg-cursor-glow {
-  background: radial-gradient(
-    560px circle at var(--glow-x, 50%) var(--glow-y, 20%),
-    rgba(124, 92, 255, 0.1),
-    transparent 70%
-  );
-  opacity: var(--glow-opacity, 0);
-  transition: opacity 0.6s ease;
-}
-
 .bg-parallax-layer {
   transform: translate3d(var(--parallax-x, 0px), var(--parallax-y, 0px), 0);
-  transition: transform 0.4s ease-out;
+  transition: transform 0.5s ease-out;
   will-change: transform;
+}
+
+/* Faint cursor-follow illumination, driven by a Motion spring in
+   BackgroundSystem.tsx. Hidden outright (not just left static) on touch
+   devices and for reduced-motion users, since a fine pointer is what gives
+   it meaning. */
+@media (pointer: coarse) {
+  .bg-light-layer {
+    display: none;
+  }
 }
 
 .bg-code-fragment {
@@ -68,38 +70,25 @@ body {
   font-family: var(--font-mono);
   font-size: 0.75rem;
   letter-spacing: 0.02em;
-  color: rgba(245, 245, 245, 0.05);
+  color: rgba(245, 245, 245, 0.045);
   user-select: none;
-  animation: code-drift 14s ease-in-out infinite;
 }
 
 .bg-graph {
-  color: rgba(245, 245, 245, 0.4);
+  color: rgba(245, 245, 245, 0.35);
 }
 
 .bg-node {
-  animation: node-breathe 7s ease-in-out infinite;
+  animation: node-breathe 9s ease-in-out infinite;
 }
 
 @keyframes node-breathe {
   0%,
   100% {
-    opacity: 0.15;
+    opacity: 0.12;
   }
   50% {
-    opacity: 0.55;
-  }
-}
-
-@keyframes code-drift {
-  0%,
-  100% {
-    opacity: 0.5;
-    transform: translateY(0);
-  }
-  50% {
-    opacity: 1;
-    transform: translateY(-4px);
+    opacity: 0.4;
   }
 }
 
@@ -162,23 +151,6 @@ body {
   }
 }
 
-/* Hero entrance animation */
-@keyframes reveal {
-  from {
-    opacity: 0;
-    transform: translateY(16px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.reveal {
-  opacity: 0;
-  animation: reveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
 @keyframes scroll-bounce {
   0%,
   100% {
@@ -219,12 +191,6 @@ body {
     scroll-behavior: auto;
   }
 
-  .reveal {
-    animation: none;
-    opacity: 1;
-    transform: none;
-  }
-
   .scroll-indicator {
     animation: none;
   }
@@ -236,7 +202,6 @@ body {
   }
 
   .bg-node,
-  .bg-code-fragment,
   .signal-dot {
     animation: none;
     opacity: 0.3;
@@ -247,8 +212,8 @@ body {
     transition: none;
   }
 
-  .bg-cursor-glow {
-    opacity: 0;
+  .bg-light-layer {
+    display: none;
   }
 
   .scroll-progress-bar {

@@ -41,7 +41,7 @@ export default function LeadershipAchievements() {
           {currentLeadership.map((entry, index) => (
             <li key={entry.id}>
               <Reveal delay={index * 100}>
-                <article className="group overflow-hidden rounded-2xl border border-border transition-colors duration-300 hover:border-accent/40">
+                <article className="group overflow-hidden border border-border transition-colors duration-300 hover:border-accent/40">
                   <div className="grid gap-10 p-6 sm:p-10 lg:grid-cols-2 lg:items-center lg:gap-16 lg:p-14">
                     <div className="flex flex-col gap-5">
                       <p className="font-mono text-xs uppercase tracking-[0.3em] text-muted">
@@ -52,7 +52,7 @@ export default function LeadershipAchievements() {
                         {entry.role}
                       </h3>
 
-                      <p className="text-lg font-medium uppercase leading-snug tracking-wide text-accent sm:text-xl">
+                      <p className="text-lg font-medium uppercase leading-snug tracking-wide text-foreground sm:text-xl">
                         {entry.organization}
                       </p>
 
@@ -111,7 +111,7 @@ export default function LeadershipAchievements() {
           <ol className="mt-6 grid grid-cols-1 items-start gap-6 sm:grid-cols-2">
             {achievements.map((achievement) => (
               <li key={achievement.id}>
-                <article className="group flex flex-col gap-5 rounded-2xl border border-border p-6 transition-colors duration-300 hover:border-accent/40 sm:p-8">
+                <article className="group flex flex-col gap-5 border border-border p-6 transition-colors duration-300 hover:border-accent/40 sm:p-8">
                   <div className="flex flex-col gap-3">
                     <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted">
                       <span className="text-accent">{achievement.index}</span> / {achievement.date}

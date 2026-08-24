@@ -46,12 +46,12 @@ export default function Experience() {
                 <div
                   className={`grid gap-8 lg:items-start lg:gap-14 ${IMAGE_COLUMN_CLASS[entry.id]}`}
                 >
-                  <div className="flex flex-col gap-5 transition-transform duration-300 lg:group-hover:translate-x-1">
+                  <div className="flex flex-col gap-5">
                     <h3 className="text-2xl font-medium uppercase leading-tight tracking-tight text-foreground sm:text-3xl">
                       {entry.role}
                     </h3>
 
-                    <p className="text-lg font-medium uppercase leading-snug tracking-wide text-accent transition-all duration-300 sm:text-xl lg:group-hover:brightness-125 lg:group-hover:tracking-wider">
+                    <p className="text-lg font-medium uppercase leading-snug tracking-wide text-foreground sm:text-xl">
                       {entry.organization}
                     </p>
 
@@ -64,7 +64,7 @@ export default function Experience() {
                     </div>
 
                     {entry.bullets && entry.bullets.length > 0 ? (
-                      <ul className="flex flex-col gap-2">
+                      <ul className="flex flex-col gap-2 transition-transform duration-500 lg:group-hover:translate-x-1">
                         {entry.bullets.map((bullet) => (
                           <li key={bullet} className="flex gap-3 text-sm leading-relaxed text-muted sm:text-base">
                             <span aria-hidden="true" className="mt-2 h-1 w-1 shrink-0 rounded-full bg-accent" />
@@ -75,7 +75,7 @@ export default function Experience() {
                     ) : null}
                   </div>
 
-                  <div className="relative w-full overflow-hidden rounded-2xl border border-border transition-colors duration-300 lg:group-hover:border-accent/40">
+                  <div className="relative w-full overflow-hidden border border-border transition-colors duration-300 lg:group-hover:border-accent/40">
                     <FramedImage
                       src={entry.image.src}
                       alt={entry.image.alt}
@@ -85,12 +85,8 @@ export default function Experience() {
                       // A fixed `scale` (set inline) would otherwise be overridden by this
                       // hover class, since inline transforms win over Tailwind utilities.
                       imageClassName={
-                        entry.image.scale ? "" : "transition-transform duration-500 lg:group-hover:scale-[1.025]"
+                        entry.image.scale ? "" : "transition-transform duration-500 lg:group-hover:scale-[1.02]"
                       }
-                    />
-                    <span
-                      aria-hidden="true"
-                      className="absolute inset-y-0 left-0 w-[2px] bg-accent/40 transition-colors duration-300 lg:group-hover:bg-accent"
                     />
 
                     <div

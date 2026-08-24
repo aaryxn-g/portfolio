@@ -81,6 +81,11 @@ export const PROJECTS_CONTENT = {
         "Designed a fairness-aware training pipeline combining balanced sampling, constrained optimization for equalized odds, and a minimum accuracy guardrail.",
         "Reduced demographic accuracy disparity by approximately 33.8%, improved overall accuracy by 38.9%, and achieved up to 131% performance lift for underrepresented groups.",
       ],
+      benchmarks: [
+        { label: "Disparity Reduction", value: "33.8%" },
+        { label: "Accuracy Improvement", value: "38.9%" },
+        { label: "Underrepresented-Group Lift", value: "up to 131%" },
+      ],
       technologies: ["Machine Learning", "Fairness in AI", "Face Recognition", "Optimization"],
       image: {
         src: "/images/project-fairness.jpg",
